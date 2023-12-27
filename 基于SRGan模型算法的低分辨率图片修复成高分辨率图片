@@ -5,10 +5,10 @@ from tensorflow.keras.optimizers import Adam
 
 def generator():# 定义生成器模型
     input_shape = (None, None, 3)
-    inputs = Input(shape=input_shape)   # 输入层
-    x = Conv2D(64, 9, padding='same')(inputs) # 特征提取层
+    inputs = Input(shape=input_shape)   # 输入层,输入图片的数据矩阵
+    x = Conv2D(64, 9, padding='same')(inputs) # 特征提取层，提取样本的特征概率分布
     x = LeakyReLU()(x)
-    for _ in range(16): # 添加残差块
+    for _ in range(16): # 添加残差块，进行残差计算
         skip = x
         x = Conv2D(64, 3, padding='same')(x)
         x = BatchNormalization()(x)
@@ -16,10 +16,10 @@ def generator():# 定义生成器模型
         x = Conv2D(64, 3, padding='same')(x)
         x = BatchNormalization()(x)
         x = Add()([skip, x])
-    x = Conv2D(256, 3, padding='same')(x) # 上采样层
+    x = Conv2D(256, 3, padding='same')(x) # 采样层，还是进行特征分类与计算
     x = tf.nn.depth_to_space(x, 2)
     x = LeakyReLU()(x)
-    x = Conv2D(3, 9, padding='same', activation='tanh')(x)  # 输出层
+    x = Conv2D(3, 9, padding='same', activation='tanh')(x)  # 输出层，输出概率分布，便于恢复图像
     generator = Model(inputs=inputs, outputs=x)  # 创建生成器模型
     return generator
 def discriminator():# 定义判别器模型，输入和特征提取与生成器相同
@@ -27,7 +27,7 @@ def discriminator():# 定义判别器模型，输入和特征提取与生成器�
     inputs = Input(shape=input_shape)
     x = Conv2D(64, 3, padding='same')(inputs)
     x = LeakyReLU()(x)
-    x = Conv2D(64, 3, strides=2, padding='same')(x)# 添加卷积层
+    x = Conv2D(64, 3, strides=2, padding='same')(x)# 添加卷积层，在卷积层中进行不断滑动和叠加
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = Conv2D(128, 3, padding='same')(x)
