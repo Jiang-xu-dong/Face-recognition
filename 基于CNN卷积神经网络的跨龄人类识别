@@ -5,7 +5,7 @@ from tensorflow.keras.optimizers import Adam
 
 def cnn(input_shape, num_classes):# 构建CNN模型
     model = Sequential()
-    # 以下就要添加卷积层和池化层
+    # 以下就要添加卷积层和池化层，这是cnn网络中的重要部分
     model.add(Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
     model.add(MaxPooling2D((2, 2)))
     model.add(Conv2D(64, (3, 3), activation='relu'))
@@ -18,17 +18,17 @@ def cnn(input_shape, num_classes):# 构建CNN模型
     return model
 def VGG():# 定义数据加载和预处理步骤
     return train_images, train_labels, test_images, test_labels
-train_images, train_labels, test_images, test_labels = load_and_preprocess_data()# 加载和预处理数据
+train_images, train_labels, test_images, test_labels = load_and_preprocess_data()# 加载和预处理数据，预处理数据便于卷积网络的滑动叠加
 input_shape = (64, 64, 3)  #输入数据的大小
 num_classes = 10 #特征类别数量
 rate = 0.001  #超参数，我们在这里要自己定义
-size = 32  # 生成网络预处理大小
+size = 32  # 生成网络预处理数据的快尺寸大小
 epochs = 10  # 这里指的是进行训练的层数
 model = cnn(input_shape, num_classes)# 构建CNN模型
 model.compile(optimizer=Adam(learning_rate),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
-model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, validation_data=(test_images, test_labels))# 编译模型
+model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, validation_data=(test_images, test_labels))
 test_loss, test_accuracy = model.evaluate(test_images, test_labels)# 评估模型
 print('Test Loss:', test_loss)
 print('Test Accuracy:', test_accuracy)
