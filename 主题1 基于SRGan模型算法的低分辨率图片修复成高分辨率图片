@@ -1,0 +1,51 @@
+import tensorflow as tf
+from tensorflow.keras.layers import Conv2D, BatchNormalization, LeakyReLU, Add, Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+
+def generator():# 定义生成器模型
+    input_shape = (None, None, 3)
+    inputs = Input(shape=input_shape)   # 输入层
+    x = Conv2D(64, 9, padding='same')(inputs) # 特征提取层
+    x = LeakyReLU()(x)
+    for _ in range(16): # 添加残差块
+        skip = x
+        x = Conv2D(64, 3, padding='same')(x)
+        x = BatchNormalization()(x)
+        x = LeakyReLU()(x)
+        x = Conv2D(64, 3, padding='same')(x)
+        x = BatchNormalization()(x)
+        x = Add()([skip, x])
+    x = Conv2D(256, 3, padding='same')(x) # 上采样层
+    x = tf.nn.depth_to_space(x, 2)
+    x = LeakyReLU()(x)
+    x = Conv2D(3, 9, padding='same', activation='tanh')(x)  # 输出层
+    generator = Model(inputs=inputs, outputs=x)  # 创建生成器模型
+    return generator
+def discriminator():# 定义判别器模型，输入和特征提取与生成器相同
+    input_shape = (None, None, 3)
+    inputs = Input(shape=input_shape)
+    x = Conv2D(64, 3, padding='same')(inputs)
+    x = LeakyReLU()(x)
+    x = Conv2D(64, 3, strides=2, padding='same')(x)# 添加卷积层
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x = Conv2D(128, 3, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x = Conv2D(128, 3, strides=2, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x = Conv2D(256, 3, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x = Conv2D(256, 3, strides=2, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x = Conv2D(512, 3, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x = Conv2D(512, 3, strides=2, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x) 
+#以下输出遇到困难，难以继续
